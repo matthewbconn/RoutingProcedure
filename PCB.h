@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <time.h>
 #include <stack>
+#include <cmath>
 #include "mnPoint.h"
 #include "Cell.h"
 
@@ -47,6 +48,7 @@ public:
     void iterateL_Aker();
     bool termCriteriaMet();
     int manhattanDist(mnPoint P1, mnPoint P2);
+    int radialDist(mnPoint P1, mnPoint P2);
     void updateL();
     void printExplored();
     void printExploredAker();
@@ -66,6 +68,7 @@ public:
     void leeSolve();
     void akerSolve();
     void avoidCenter();
+    void avoidRadial(mnPoint c);
     void avoidEdge();
     void addAvoidPath();
     void printCellWeights();

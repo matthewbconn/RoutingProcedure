@@ -142,7 +142,7 @@ bool PCB::exploreCell(mnPoint P) {
         if (grid[P.m][P.n].viewStatus == newCell) {
             // explore the cell...
             // false if we use the cell now
-            if (grid[P.m][P.n].cost == 1) { // add if cellCost = current bid
+            if (grid[P.m][P.n].cost == 1 || grid[P.m][P.n].contents==target) { // add if cellCost = current bid
                 grid[P.m][P.n].leeWt = curBid;
                 L1.push_back(P);
                 grid[P.m][P.n].viewStatus = explored;
@@ -179,7 +179,7 @@ bool PCB::exploreCellAker(mnPoint P, mnPoint cur) {
         if (grid[P.m][P.n].viewStatus == newCell) {
             // explore the cell...
             // false if we use the cell now
-            if (grid[P.m][P.n].cost == 1) { // add if cellCost = current bid
+            if (grid[P.m][P.n].cost == 1 || grid[P.m][P.n].contents==target) { // add if cellCost = current bid
                 grid[P.m][P.n].myAkersWt = nextAker(grid[cur.m][cur.n]);
                 grid[P.m][P.n].prevAkersWt = grid[cur.m][cur.n].myAkersWt;
                 grid[P.m][P.n].leeWt = curBid;
@@ -640,4 +640,30 @@ void PCB::printCellWeights() {
     }
 
     std::cout << "Done printing cell weights\n" << std::endl;
+}
+
+int PCB::radialDist(mnPoint P1, mnPoint P2) {
+    return sqrt((P1.m - P2.m)*(P1.m - P2.m) + (P1.n-P2.n)*(P1.n-P2.n));
+}
+
+void PCB::avoidRadial(mnPoint c) {
+    int centerDist = radialDist(c, {rows/2,cols/2});
+    int topLeftDist = radialDist(c, {0,0});
+    int topRightDist = radialDist(c, {0,cols-1});
+    int bottomLeftDist = radialDist(c,{rows-1,0});
+    int bottomRightDist = radialDist(c,{rows-1,cols-1});
+
+    int maxDist = centerDist;
+    if (topLeftDist > maxDist) {maxDist = topLeftDist;}
+    if (topRightDist > maxDist) {maxDist = topRightDist;}
+    if (bottomLeftDist > maxDist) {maxDist = bottomLeftDist;}
+    if (bottomRightDist > maxDist) {maxDist = bottomRightDist;}
+
+    for (int m = 0; m < rows; ++m) {
+        for (int n = 0; n < cols; ++n) {
+               grid[m][n].cost = maxDist - radialDist(c,{m,n});
+        }
+    }
+
+    printCellWeights();
 }
